@@ -4,9 +4,10 @@ Basic script for Acess key and Secret key generator
 ## Requirements
 redis-server &
 redisc-cli
-> AUTH PASSWORD
-> CONFIG SET requirepass "david"
-> AUTH david
+
+    > AUTH PASSWORD
+    > CONFIG SET requirepass "david"
+    > AUTH david
 
 1. init.sh
 2. producer.sh
