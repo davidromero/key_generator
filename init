@@ -1,0 +1,5 @@
+#!/bin/bash
+redis-cli --no-auth-warning -h 192.168.1.21 -a david flushdb
+redis-cli --no-auth-warning -h 192.168.1.21 -a david set counter_inc 0
+redis-cli --no-auth-warning -h 192.168.1.21 -a david set counter_dec 0
+

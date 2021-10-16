@@ -1,0 +1,16 @@
+#!/bin/bash
+COUNTER_INC=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_inc)
+COUNTER_DEC=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_dec)
+while [ "$COUNTER_INC" -gt "$COUNTER_DEC" ];
+do
+	COUNTER_INC=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_inc)
+	COUNTER_DEC=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_dec)
+	echo "Available keys: " $COUNTER_INC "Used keys: " $COUNTER_DEC
+        DATE_NOW=$(date +%F_%H-%M-%S)
+        JSON_RESPONSE=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get "keys_num"$COUNTER_DEC | jq '.status = "1"' | jq --arg dt "$DATE_NOW" '. + {"usage_date" : $dt}')
+	redis-cli -h 192.168.1.21 -a david del "keys_num"$COUNTER_DEC &> /dev/null
+        redis-cli -h 192.168.1.21 -a david set "keys_num"$COUNTER_DEC "$JSON_RESPONSE" &> /dev/null
+	redis-cli --no-auth-warning -h 192.168.1.21 -a david incr counter_dec &> /dev/null
+done
+ echo "no available keys"
+exit 1

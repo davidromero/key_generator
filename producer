@@ -1,0 +1,15 @@
+#!/bin/bash
+COUNTER=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_inc)
+while :
+do
+	COUNTER=$(redis-cli --no-auth-warning -h 192.168.1.21 -a david get counter_inc)
+	ACCESS_KEY="$(uuidgen | cut -c1-13 | sed 's/-//')"
+	SECRET_KEY="$(uuidgen)"
+	COUNTER=$((COUNTER + 1))
+	DATE_NOW=$(date +%F_%H-%M-%S)
+	JSON_STRING=$(jq -n --arg ak "$ACCESS_KEY" --arg sk "$SECRET_KEY" --arg dt "$DATE_NOW" '{access_key: $ak, secret_key: $sk, status: 0, creation_date: $dt}')
+	echo "keys_num"$COUNTER "		:" $JSON_STRING
+	redis-cli -h 192.168.1.21 -a david set "keys_num"$COUNTER "$JSON_STRING" &>/dev/null
+	redis-cli --no-auth-warning -h 192.168.1.21 -a david incr counter_inc &>/dev/null
+	COUNTER=$((COUNTER + 1))
+done
